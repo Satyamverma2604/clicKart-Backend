@@ -1,0 +1,124 @@
+users
+  │
+  ├──────── addresses
+  │
+  ├──────── orders
+  │
+  ├──────── cart
+  │
+  ├──────── wishlist
+  │
+  └──────── reviews
+
+categories
+  │
+  └──────── products
+
+products
+  │
+  ├──────── product_images
+  │
+  ├──────── reviews
+  │
+  └──────── cart_items
+
+orders
+  │
+  ├──────── order_items
+  │
+  └──────── payments
+  
+  
+  
+ ******************************************************DATABASE DESIGN************************************************* 
+  
+  
+  
+                         ┌─────────────────────┐
+                         │      CATEGORY       │
+                         ├─────────────────────┤
+                         │ PK  id              │
+                         │     name            │
+                         │     description     │
+                         │     active          │
+                         └──────────┬──────────┘
+                                    │
+                                    │ 1 : N
+                                    ▼
+                         ┌─────────────────────┐
+                         │       PRODUCT       │
+                         ├─────────────────────┤
+                         │ PK  id              │
+                         │     name            │
+                         │     description     │
+                         │     price           │
+                         │     stock_quantity  │
+                         │     brand           │
+                         │     image_url       │
+                         │     active          │
+                         │ FK  category_id     │
+                         └──────┬──────────────┘
+                                │
+                    ┌───────────┴────────────┐
+                    │                        │
+                  1 : N                    1 : N
+                    │                        │
+                    ▼                        ▼
+          ┌──────────────────┐     ┌──────────────────┐
+          │    CART_ITEM     │     │    ORDER_ITEM    │
+          ├──────────────────┤     ├──────────────────┤
+          │ PK id            │     │ PK id            │
+          │ FK cart_id       │     │ FK order_id      │
+          │ FK product_id    │     │ FK product_id    │
+          │ quantity         │     │ quantity         │
+          │ price            │     │ price            │
+          └────────┬─────────┘     │ subtotal         │
+                   │               └────────┬─────────┘
+                   │                        │
+                   ▼                        ▼
+          ┌──────────────────┐     ┌──────────────────┐
+          │      CART        │     │      ORDERS      │
+          ├──────────────────┤     ├──────────────────┤
+          │ PK id            │     │ PK id            │
+          │ FK user_id       │     │ FK user_id       │
+          │ created_at       │     │ FK address_id    │
+          │ updated_at       │     │ order_date      │
+          └────────┬─────────┘     │ status           │
+                   │               │ total_amount     │
+                   │               │ payment_status   │
+                   │               │ created_at       │
+                   │               │ updated_at       │
+                   │               └────────┬─────────┘
+                   │                        │
+                   └──────────┐    ┌────────┘
+                              │    │
+                              ▼    ▼
+                         ┌──────────────┐
+                         │     USER     │
+                         ├──────────────┤
+                         │ PK id        │
+                         │ name         │
+                         │ email        │
+                         │ password     │
+                         │ phone        │
+                         │ role         │
+                         │ enabled      │
+                         │ created_at   │
+                         │ updated_at   │
+                         └──────┬───────┘
+                                │
+                                │ 1 : N
+                                ▼
+                         ┌──────────────┐
+                         │   ADDRESS    │
+                         ├──────────────┤
+                         │ PK id        │
+                         │ house_no     │
+                         │ street       │
+                         │ city         │
+                         │ state        │
+                         │ country      │
+                         │ postal_code  │
+                         │ address_type │
+                         │ FK user_id   │
+                         └──────────────┘

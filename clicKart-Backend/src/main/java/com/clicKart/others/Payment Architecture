@@ -1,0 +1,10 @@
+OrderService
+     │
+     ▼
+PaymentService
+     │
+     ▼
+PaymentGateway
+     │
+     ├── Razorpay
+     └── Stripe

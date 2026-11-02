@@ -1,0 +1,292 @@
+
+ ******************************************************PROJECT STRUCTURE*************************************************    
+
+User
+│
+├── id
+├── name
+├── email
+├── password
+├── phone
+├── role
+├── enabled
+├── createdAt
+├── updatedAt
+│
+├── addresses
+│      │
+│      ▼
+│   Address
+│   ├── id
+│   ├── houseNo
+│   ├── street
+│   ├── city
+│   ├── state
+│   ├── country
+│   ├── postalCode
+│   ├── addressType
+│   └── user
+│
+├── cart
+│      │
+│      ▼
+│    Cart
+│    ├── id
+│    ├── user
+│    ├── createdAt
+│    ├── updatedAt
+│    │
+│    └── items
+│          │
+│          ▼
+│       CartItem
+│       ├── id
+│       ├── cart
+│       ├── product
+│       ├── quantity
+│       └── price
+│
+└── orders
+       │
+       ▼
+     Order
+     ├── id
+     ├── user
+     ├── shippingAddress
+     ├── orderDate
+     ├── status
+     ├── totalAmount
+     ├── paymentStatus
+     ├── createdAt
+     ├── updatedAt
+     │
+     └── items
+           │
+           ▼
+        OrderItem
+        ├── id
+        ├── order
+        ├── product
+        ├── quantity
+        ├── price
+        └── sub-total
+
+
+Product
+│
+├── id
+├── name
+├── description
+├── price
+├── stockQuantity
+├── brand
+├── imageUrl
+├── active
+└── category
+        │
+        ▼
+     Category
+     ├── id
+     ├── name
+     ├── description
+     └── active
+     
+     
+     
+     
+ ******************************************************DETAILED PROJECT STRUCTURE*************************************************    
+     
+     
+     
+clicKart
+│
+├── src/main/java/com/clicKart
+│
+├── user
+│   ├── controller
+│   │   └── UserController
+│   │
+│   ├── dto
+│   │   ├── UserRequest
+│   │   └── UserResponse
+│   │
+│   ├── entity
+│   │   └── User
+│   │
+│   ├── repository
+│   │   └── UserRepository
+│   │
+│   └── service
+│       ├── UserService
+│       └── UserServiceImpl
+│
+│
+├── address
+│   ├── controller
+│   │   └── AddressController
+│   │
+│   ├── dto
+│   │   ├── AddressRequest
+│   │   └── AddressResponse
+│   │
+│   ├── entity
+│   │   └── Address
+│   │
+│   ├── repository
+│   │   └── AddressRepository
+│   │
+│   └── service
+│       ├── AddressService
+│       └── AddressServiceImpl
+│
+│
+├── category                              ✅ COMPLETED
+│   ├── controller
+│   │   └── CategoryController             ✅
+│   │
+│   ├── dto
+│   │   ├── CategoryRequest                ✅
+│   │   └── CategoryResponse               ✅
+│   │
+│   ├── entity
+│   │   └── Category                       ✅
+│   │
+│   ├── repository
+│   │   └── CategoryRepository             ✅
+│   │
+│   └── service
+│       ├── CategoryService                ✅
+│       └── CategoryServiceImpl            ✅
+│
+│
+├── product                               ✅ COMPLETED
+│   ├── controller
+│   │   └── ProductController              ✅
+│   │
+│   ├── dto
+│   │   ├── ProductRequest                 ✅
+│   │   └── ProductResponse                ✅
+│   │
+│   ├── entity
+│   │   └── Product                        ✅
+│   │
+│   ├── repository
+│   │   └── ProductRepository              ✅
+│   │
+│   └── service
+│       ├── ProductService                 ✅
+│       └── ProductServiceImpl             ✅
+│
+│
+├── cart
+│   ├── controller
+│   │   └── CartController
+│   │
+│   ├── dto
+│   │   ├── CartItemRequest
+│   │   ├── UpdateCartItemRequest
+│   │   ├── CartItemResponse
+│   │   └── CartResponse
+│   │
+│   ├── entity
+│   │   ├── Cart
+│   │   └── CartItem
+│   │
+│   ├── repository
+│   │   ├── CartRepository
+│   │   └── CartItemRepository
+│   │
+│   └── service
+│       ├── CartService
+│       └── CartServiceImpl
+│
+│
+├── order
+│   ├── controller
+│   │   └── OrderController
+│   │
+│   ├── dto
+│   │   ├── OrderResponse
+│   │   └── OrderItemResponse
+│   │
+│   ├── entity
+│   │   ├── Order
+│   │   └── OrderItem
+│   │
+│   ├── repository
+│   │   ├── OrderRepository
+│   │   └── OrderItemRepository
+│   │
+│   └── service
+│       ├── OrderService
+│       └── OrderServiceImpl
+│
+│
+├── security                              ⏳ LATER
+│   ├── config
+│   │   └── SecurityConfig
+│   │
+│   ├── filter
+│   │   └── JwtAuthenticationFilter
+│   │
+│   ├── service
+│   │   ├── CustomUserDetailsService
+│   │   └── JwtService
+│   │
+│   └── util
+│       └── JwtUtil
+│
+│
+├── auth                                  ⏳ LATER
+│   ├── controller
+│   │   └── AuthController
+│   │
+│   ├── dto
+│   │   ├── RegisterRequest
+│   │   ├── LoginRequest
+│   │   └── JwtResponse
+│   │
+│   └── service
+│       ├── AuthService
+│       └── AuthServiceImpl
+│
+│
+├── payment                               ⏳ LATER
+│   ├── controller
+│   │   └── PaymentController
+│   │
+│   ├── dto
+│   │   ├── PaymentRequest
+│   │   └── PaymentResponse
+│   │
+│   ├── service
+│   │   ├── PaymentService
+│   │   └── PaymentServiceImpl
+│   │
+│   └── gateway
+│       └── PaymentGateway
+│
+│
+├── chatbot                               ⏳ LATER
+│   ├── controller
+│   │   └── ChatbotController
+│   │
+│   ├── dto
+│   │   ├── ChatRequest
+│   │   └── ChatResponse
+│   │
+│   └── service
+│       ├── ChatbotService
+│       └── ChatbotServiceImpl
+│
+│
+├── exception                             ⏳ LATER
+│   ├── GlobalExceptionHandler
+│   ├── ResourceNotFoundException
+│   ├── DuplicateResourceException
+│   ├── BadRequestException
+│   └── ErrorResponse
+│
+│
+└── config                                ⏳ LATER
+    └── ApplicationConfig

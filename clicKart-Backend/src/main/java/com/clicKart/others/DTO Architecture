@@ -1,0 +1,83 @@
+
+
+com.ecommerce
+│
+├── user
+│   └── dto
+│       ├── UserRequest.java
+│       └── UserResponse.java
+│
+├── address
+│   └── dto
+│       ├── AddressRequest.java
+│       └── AddressResponse.java
+│
+├── category
+│   └── dto
+│       ├── CategoryRequest.java
+│       └── CategoryResponse.java
+│
+├── product
+│   └── dto
+│       ├── ProductRequest.java
+│       └── ProductResponse.java
+│
+├── cart
+│   └── dto
+│       ├── CartItemRequest.java
+│       ├── CartItemResponse.java
+│       └── CartResponse.java
+│
+└── order
+    └── dto
+        ├── OrderResponse.java
+        └── OrderItemResponse.java
+        
+        
+        
+        
+                         
+                 REQUEST
+                ---------- 
+                 
+                 
+                 DATABASE
+                    ↑
+                    ↓
+               Repository
+                    ↑
+                    ↓
+                 Entity
+                    ↑
+                    ↓
+                 Service
+                    ↑
+                    ↓
+              Request DTO
+                    ↑
+                    ↓
+                Controller
+                    ↑
+                    ↓
+                  React
+                  
+                  
+                 		
+                 		RESPONSE
+                 	------------------
+                 						   
+						Database
+   						  ↓
+						Repository
+   						  ↓
+						Entity
+   						  ↓
+						Service
+   						  ↓
+						Response DTO
+   						  ↓
+						Controller
+   						  ↓
+						JSON
+   						  ↓
+						React

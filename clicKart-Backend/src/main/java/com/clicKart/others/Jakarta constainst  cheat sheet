@@ -1,0 +1,203 @@
+JAKARTA BEAN VALIDATION - CONSTRAINTS CHEAT SHEET
+==================================================
+Package: jakarta.validation.constraints  (Spring Boot 3.x)
+         javax.validation.constraints    (Spring Boot 2.x)
+
+Dependency needed in pom.xml:
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+
+
+1. MOST IMPORTANT CONSTRAINTS
+--------------------------------------------------
+
+@NotNull
+    Checks: value is not null (empty string is allowed)
+    Works on: any type
+
+@NotEmpty
+    Checks: not null and not empty ("" or size 0)
+    Works on: String, Collection, Map, array
+
+@NotBlank
+    Checks: not null, not empty, not only spaces
+    Works on: String only
+
+@Size(min, max)
+    Checks: length/size is within range
+    Works on: String, Collection, Map, array
+
+@Min(value) / @Max(value)
+    Checks: number is at least / at most the value
+    Works on: Integer, Long, BigDecimal, etc.
+
+@Positive / @PositiveOrZero
+    Checks: number > 0 / number >= 0
+    Works on: numbers
+
+@Negative / @NegativeOrZero
+    Checks: number < 0 / number <= 0
+    Works on: numbers
+
+@DecimalMin / @DecimalMax
+    Checks: same as Min/Max but for decimals
+    Works on: BigDecimal, String
+
+@Digits(integer, fraction)
+    Checks: number of digits allowed (good for prices)
+    Works on: numbers
+
+@Email
+    Checks: valid email format
+    Works on: String
+
+@Pattern(regexp)
+    Checks: matches a regular expression
+    Works on: String
+
+@Past / @PastOrPresent
+    Checks: date is in the past
+    Works on: date/time types
+
+@Future / @FutureOrPresent
+    Checks: date is in the future
+    Works on: date/time types
+
+@AssertTrue / @AssertFalse
+    Checks: boolean must be true / false
+    Works on: boolean
+
+@Null
+    Checks: must be null
+    Works on: any type
+
+
+2. NotNull vs NotEmpty vs NotBlank (most confused)
+--------------------------------------------------
+
+    Value      @NotNull    @NotEmpty    @NotBlank
+    null       invalid     invalid      invalid
+    ""         valid       invalid      invalid
+    "   "      valid       valid        invalid
+    "abc"      valid       valid        valid
+
+For String fields like "name", use @NotBlank.
+
+
+3. EXAMPLE: CategoryRequest DTO
+--------------------------------------------------
+
+package com.clicKart.category.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+public class CategoryRequest {
+
+    @NotBlank(message = "Category name is required")
+    @Size(max = 100, message = "Category name must be at most 100 characters")
+    private String name;
+
+    @Size(max = 500, message = "Description must be at most 500 characters")
+    private String description;
+}
+
+
+4. EXAMPLES FOR AN E-COMMERCE APP
+--------------------------------------------------
+
+@NotBlank
+@Size(max = 100)
+private String name;
+
+@NotNull
+@Positive
+@Digits(integer = 8, fraction = 2)
+private BigDecimal price;
+
+@Min(0)
+private Integer stock;
+
+@Email
+@NotBlank
+private String email;
+
+@Pattern(regexp = "^[6-9]\\d{9}$", message = "Invalid mobile number")
+private String phone;
+
+@NotEmpty
+private List<Long> categoryIds;
+
+
+5. @Valid vs @Validated
+--------------------------------------------------
+
+@Valid      -> Jakarta standard (jakarta.validation.Valid)
+@Validated  -> Spring (org.springframework.validation.annotation.Validated)
+
+    Feature                        @Valid    @Validated
+    Validation groups              No        Yes
+    Can be placed on a class       No        Yes
+    Cascades into nested objects   Yes       No
+
+Usage:
+  - Request body validation:  @Valid @RequestBody CategoryRequest request
+  - Validation groups:        @Validated(OnCreate.class)
+  - @PathVariable / @RequestParam validation: put @Validated on the class
+  - Nested objects: put @Valid on the nested field
+
+Controller example:
+
+@PostMapping
+public ResponseEntity<CategoryResponse> createCategory(
+        @Valid @RequestBody CategoryRequest request) {
+    CategoryResponse response = categoryService.createCategory(request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+}
+
+
+6. IMPORTANT NOTES
+--------------------------------------------------
+
+- Validation does nothing unless the DTO has constraints AND the
+  controller parameter has @Valid or @Validated.
+- Most constraints (@Size, @Email, @Pattern, @Min) treat null as valid.
+  Add @NotNull or @NotBlank too if the field is required.
+- On failure, Spring throws MethodArgumentNotValidException -> 400 Bad Request.
+- Bean validation checks FORMAT only. Business rules (e.g. "name already
+  exists") belong in the service layer.
+- Keep database constraints (NOT NULL, UNIQUE) as the last line of defense.
+- Match @Size limits with your @Column(length = ...) on the entity.
+- Hibernate Validator extras: @Length, @Range, @URL, @CreditCardNumber
+  (some deprecated; prefer standard ones when available).
+- Custom constraints: write your own with @Constraint and a
+  ConstraintValidator (e.g. @UniqueCategoryName).
+
+
+7. QUICK REFERENCE - ERRORS SEEN EARLIER
+--------------------------------------------------
+
+Error: Cannot make a static reference to the non-static method
+       createCategory(CategoryRequest) from the type CategoryService
+Cause: Calling CategoryService.createCategory(...) on the class.
+Fix:   Inject the service and call it on the instance:
+       categoryService.createCategory(request);
+
+
+8. JACKSON (JSON <-> Java)
+--------------------------------------------------
+
+- Deserialization: JSON -> Java object (used by @RequestBody)
+- Serialization:   Java object -> JSON (used by ResponseEntity body)
+- Already included via spring-boot-starter-web (no separate dependency).
+- DTO needs a default constructor plus setters (or Lombok @Data/@Getter/@Setter).
+- Useful annotations: @JsonProperty, @JsonIgnore, @JsonInclude(NON_NULL)

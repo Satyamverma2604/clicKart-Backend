@@ -1,0 +1,448 @@
+SPRING DATA JPA - DERIVED QUERY KEYWORDS
+========================================
+
+Spring Data JPA provides built-in keywords that can be used in repository method names.
+
+Spring automatically analyzes the method name and generates the required query.
+
+
+1. EQUALS
+---------
+
+Keyword:
+    Equals
+
+Example:
+    findByNameEquals(String name)
+
+Meaning:
+    Finds records where name exactly matches the given value.
+
+Example:
+    findByNameEquals("Laptop")
+
+
+2. IGNORE CASE
+--------------
+
+Keyword:
+    IgnoreCase
+
+Example:
+    findByNameIgnoreCase(String name)
+
+Meaning:
+    Performs a case-insensitive comparison.
+
+Example:
+    findByNameIgnoreCase("laptop")
+
+Can match:
+    Laptop
+    LAPTOP
+    laptop
+
+
+3. CONTAINING
+-------------
+
+Keyword:
+    Containing
+
+Example:
+    findByNameContaining(String name)
+
+Meaning:
+    Finds records where the field contains the given text.
+
+Example:
+    findByNameContaining("phone")
+
+Can match:
+    iPhone
+    Phone Case
+    Smart Phone
+
+
+4. STARTING WITH
+----------------
+
+Keyword:
+    StartingWith
+
+Example:
+    findByNameStartingWith(String name)
+
+Meaning:
+    Finds records where the field starts with the given text.
+
+Example:
+    findByNameStartingWith("Lap")
+
+Can match:
+    Laptop
+    Laptop Stand
+
+
+5. ENDING WITH
+--------------
+
+Keyword:
+    EndingWith
+
+Example:
+    findByNameEndingWith(String name)
+
+Meaning:
+    Finds records where the field ends with the given text.
+
+Example:
+    findByNameEndingWith("top")
+
+Can match:
+    Laptop
+    Desktop
+
+
+6. GREATER THAN
+---------------
+
+Keyword:
+    GreaterThan
+
+Example:
+    findByPriceGreaterThan(BigDecimal price)
+
+Meaning:
+    Finds records where the value is greater than the given value.
+
+Equivalent condition:
+    price > givenValue
+
+
+7. LESS THAN
+------------
+
+Keyword:
+    LessThan
+
+Example:
+    findByPriceLessThan(BigDecimal price)
+
+Meaning:
+    Finds records where the value is less than the given value.
+
+Equivalent condition:
+    price < givenValue
+
+
+8. GREATER THAN OR EQUAL
+------------------------
+
+Keyword:
+    GreaterThanEqual
+
+Example:
+    findByPriceGreaterThanEqual(BigDecimal price)
+
+Meaning:
+    Finds records where the value is greater than or equal to the given value.
+
+Equivalent condition:
+    price >= givenValue
+
+
+9. LESS THAN OR EQUAL
+---------------------
+
+Keyword:
+    LessThanEqual
+
+Example:
+    findByPriceLessThanEqual(BigDecimal price)
+
+Meaning:
+    Finds records where the value is less than or equal to the given value.
+
+Equivalent condition:
+    price <= givenValue
+
+
+10. BETWEEN
+-----------
+
+Keyword:
+    Between
+
+Example:
+    findByPriceBetween(BigDecimal min, BigDecimal max)
+
+Meaning:
+    Finds records where the value is between the given minimum and maximum values.
+
+Equivalent condition:
+    min <= price <= max
+
+
+11. IN
+------
+
+Keyword:
+    In
+
+Example:
+    findByIdIn(List<Long> ids)
+
+Meaning:
+    Finds records whose value exists in the given collection.
+
+Example:
+    findByIdIn(List.of(1L, 2L, 5L))
+
+Equivalent SQL:
+    WHERE id IN (1, 2, 5)
+
+
+12. NOT IN
+----------
+
+Keyword:
+    NotIn
+
+Example:
+    findByIdNotIn(List<Long> ids)
+
+Meaning:
+    Finds records whose value is NOT present in the given collection.
+
+
+13. IS NULL
+-----------
+
+Keyword:
+    IsNull
+
+Example:
+    findByDescriptionIsNull()
+
+Meaning:
+    Finds records where the field is NULL.
+
+Equivalent SQL:
+    WHERE description IS NULL
+
+
+14. IS NOT NULL
+---------------
+
+Keyword:
+    IsNotNull
+
+Example:
+    findByDescriptionIsNotNull()
+
+Meaning:
+    Finds records where the field is NOT NULL.
+
+Equivalent SQL:
+    WHERE description IS NOT NULL
+
+
+15. TRUE
+--------
+
+Keyword:
+    True
+
+Example:
+    findByActiveTrue()
+
+Meaning:
+    Finds records where the Boolean field is true.
+
+Equivalent condition:
+    active = true
+
+
+16. FALSE
+---------
+
+Keyword:
+    False
+
+Example:
+    findByActiveFalse()
+
+Meaning:
+    Finds records where the Boolean field is false.
+
+Equivalent condition:
+    active = false
+
+
+17. BEFORE
+----------
+
+Keyword:
+    Before
+
+Example:
+    findByCreatedAtBefore(LocalDateTime date)
+
+Meaning:
+    Finds records created before the given date.
+
+Equivalent condition:
+    createdAt < givenDate
+
+
+18. AFTER
+---------
+
+Keyword:
+    After
+
+Example:
+    findByCreatedAtAfter(LocalDateTime date)
+
+Meaning:
+    Finds records created after the given date.
+
+Equivalent condition:
+    createdAt > givenDate
+
+
+19. ORDER BY
+------------
+
+Keyword:
+    OrderBy
+
+Example:
+    findByUserIdOrderByCreatedAtDesc(Long userId)
+
+Meaning:
+    Finds records for a user and sorts them by createdAt in descending order.
+
+DESC:
+    Newest → Oldest
+
+ASC:
+    Oldest → Newest
+
+
+20. AND
+-------
+
+Keyword:
+    And
+
+Example:
+    findByNameAndActive(String name, Boolean active)
+
+Meaning:
+    Both conditions must be satisfied.
+
+Equivalent condition:
+    name = givenName
+    AND
+    active = givenActive
+
+
+21. OR
+------
+
+Keyword:
+    Or
+
+Example:
+    findByNameOrBrand(String name, String brand)
+
+Meaning:
+    Either condition can be satisfied.
+
+Equivalent condition:
+    name = givenName
+    OR
+    brand = givenBrand
+
+
+22. COMBINING KEYWORDS
+----------------------
+
+Spring Data JPA allows multiple keywords in one repository method.
+
+Example:
+
+    findByNameContainingIgnoreCaseAndActiveTrue(String name)
+
+Meaning:
+
+    name contains the given text
+    AND
+    name comparison is case-insensitive
+    AND
+    active = true
+
+
+Another example:
+
+    findByCategoryIdAndPriceBetweenAndActiveTrue(
+        Long categoryId,
+        BigDecimal minPrice,
+        BigDecimal maxPrice
+    )
+
+Meaning:
+
+    category matches
+    AND
+    price is between minPrice and maxPrice
+    AND
+    product is active
+
+
+IMPORTANT
+=========
+
+Spring Data JPA automatically parses these method names.
+
+For example:
+
+    List<Product> findByActiveTrue();
+
+Spring understands:
+
+    find → SELECT
+    By → WHERE
+    Active → entity field
+    True → active = true
+
+So you do NOT need to write SQL manually for simple queries.
+
+
+INDUSTRY TIP
+============
+
+Use derived query methods when the query is simple and readable.
+
+Good:
+
+    findByEmail(String email)
+
+    findByActiveTrue()
+
+    findByCategoryId(Long categoryId)
+
+    findByNameContainingIgnoreCase(String name)
+
+
+Avoid creating extremely long method names for complex queries.
+
+For complex filtering, consider:
+
+    @Query
+    Specifications
+    QueryDSL
+
+Use the simplest approach that keeps the repository readable.

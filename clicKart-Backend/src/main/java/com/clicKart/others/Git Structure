@@ -1,0 +1,20 @@
+ai-ecommerce/
+│
+├── ecommerce-backend/
+│
+│   ├── src/
+│   ├── pom.xml
+│   └── README.md
+│
+├── ecommerce-frontend/
+│
+│   ├── src/
+│   ├── package.json
+│   └── README.md
+│
+├── docs/
+│   ├── architecture.md
+│   ├── database-design.md
+│   └── api-documentation.md
+│
+└── README.md

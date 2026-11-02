@@ -1,0 +1,186 @@
+                    ┌──────────────────────┐
+                    │       React UI       │
+                    │                      │
+                    │ Customer + Admin UI  │
+                    └──────────┬───────────┘
+                               │
+                         REST / JSON
+                               │
+                    ┌──────────▼───────────┐
+                    │    Spring Boot API   │
+                    │                      │
+                    │ Controllers          │
+                    │ Services             │
+                    │ Repositories         │
+                    │ Security / JWT       │
+                    └───────┬───────┬──────┘
+                            │       │
+             ┌──────────────┘       └───────────────┐
+             │                                      │
+     ┌───────▼────────┐                    ┌────────▼────────┐
+     │     MySQL      │                    │ External APIs   │
+     │                │                    │                 │
+     │ Users          │                    │ Payment Gateway │
+     │ Products       │                    │ AI API          │
+     │ Cart           │                    │ Email           │
+     │ Orders         │                    └─────────────────┘
+     │ Payments       │
+     └────────────────┘
+     
+     
+     
+     
+     
+     
+                Category
+                    │
+                    │ 1 : N
+                    ▼
+                 Product
+                    ▲
+                    │
+             ┌──────┴──────┐
+             │             │
+          CartItem      OrderItem
+             ▲             ▲
+             │             │
+            Cart          Order
+             ▲             ▲
+             │             │
+             └──── User ───┘
+                    │
+                    │ 1 : N
+                    ▼
+                 Address
+                 
+                 
+                 
+                 
+User
+ │
+ ├── Address
+ │
+ ├── Cart
+ │    └── CartItem ── Product
+ │
+ └── Order
+      └── OrderItem ── Product
+
+Category
+   │
+   └── Product
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+                         ┌──────────────┐
+                         │   Category   │
+                         └──────┬───────┘
+                                │
+                                │ 1:N
+                                ▼
+                         ┌──────────────┐
+                         │   Product    │
+                         └───┬──────┬───┘
+                             │      │
+                         N:1 │      │ N:1
+                             │      │
+                             ▼      ▼
+                       ┌───────┐  ┌───────┐
+                       │ Cart  │  │ Order │
+                       └───┬───┘  └───┬───┘
+                           │          │
+                           ▼          ▼
+                       CartItem    OrderItem
+                           │          │
+                           └────┬─────┘
+                                │
+                                ▼
+                           ┌─────────┐
+                           │  User   │
+                           └────┬────┘
+                                │
+                                │ 1:N
+                                ▼
+                           ┌─────────┐
+                           │ Address │
+                           └─────────┘
+                           
+                           
+                           
+                           
+                           
+                           
+                           
+                           
+******************************************************DEVELOPMENT ROADMAP*************************************************
+                           
+                           
+                           
+PHASE 1 — Core E-Commerce Backend
+│
+├── Category                         ✅
+├── Product                          ✅
+├── User                             ⏭️ NEXT
+├── Address
+├── Cart
+└── Order
+
+
+PHASE 2 — Backend Quality
+│
+├── Validation                        ✅ Partially
+├── Custom Exceptions
+├── Global Exception Handler
+└── Proper HTTP Error Responses
+
+
+PHASE 3 — Authentication & Authorization
+│
+├── Spring Security
+├── UserDetailsService
+├── Password Encoding
+├── JWT Authentication
+├── JWT Filter
+├── Role-based Authorization
+└── USER / ADMIN access
+
+
+PHASE 4 — React Frontend
+│
+├── React
+├── React Router
+├── Axios
+├── Redux Toolkit
+├── Authentication State
+├── Product UI
+├── Category UI
+├── Cart UI
+├── Checkout UI
+└── Admin Dashboard
+
+
+PHASE 5 — Payment
+│
+├── Payment Gateway
+├── Create Payment
+├── Payment Verification
+├── Payment Status
+└── Order + Payment Integration
+
+
+PHASE 6 — AI
+│
+├── AI Chatbot
+├── Product Search
+├── Product Recommendation
+├── Customer Assistance
+└── AI + E-Commerce Integration
