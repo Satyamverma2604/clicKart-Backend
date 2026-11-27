@@ -1,28 +1,25 @@
 
-# Stage 1: Build the application
-FROM eclipse-temurin:25-jdk AS build
+# Stage 1: Build application
+FROM maven:3.9-eclipse-temurin-25 AS build
 
 WORKDIR /app
 
-COPY .mvn/ .mvn/
-COPY mvnw pom.xml ./
+COPY pom.xml .
 
-RUN chmod +x mvnw
+RUN mvn -B dependency:go-offline
 
-RUN ./mvnw dependency:go-offline
+COPY src ./src
 
-COPY src/ src/
-
-RUN ./mvnw clean package -DskipTests
+RUN mvn -B clean package -DskipTests
 
 
-# Stage 2: Run the application
+# Stage 2: Run application
 FROM eclipse-temurin:25-jre
 
 WORKDIR /app
 
 COPY --from=build /app/target/*.jar app.jar
 
-EXPOSE 8080
+EXPOSE 10000
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT:-10000} -jar app.jar"]
