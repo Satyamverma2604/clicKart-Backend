@@ -137,41 +137,49 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
 
-        CorsConfiguration configuration =
-            new CorsConfiguration();
+   
+@Bean
+public CorsConfigurationSource corsConfigurationSource() {
 
-        configuration.setAllowedOrigins(
-            List.of("http://localhost:5173")
-        );
+    CorsConfiguration configuration =
+        new CorsConfiguration();
 
-        configuration.setAllowedMethods(
-            List.of(
-                "GET",
-                "POST",
-                "PUT",
-                "PATCH",
-                "DELETE",
-                "OPTIONS"
-            )
-        );
+    configuration.setAllowedOrigins(
+        List.of(
+            "http://localhost:5173",
+            "https://clic-kart-frontend.vercel.app"
+        )
+    );
 
-        configuration.setAllowedHeaders(
-            List.of("*")
-        );
+    configuration.setAllowedMethods(
+        List.of(
+            "GET",
+            "POST",
+            "PUT",
+            "PATCH",
+            "DELETE",
+            "OPTIONS"
+        )
+    );
 
-        configuration.setAllowCredentials(true);
+    configuration.setAllowedHeaders(
+        List.of("*")
+    );
 
-        UrlBasedCorsConfigurationSource source =
-            new UrlBasedCorsConfigurationSource();
+    configuration.setAllowCredentials(true);
 
-        source.registerCorsConfiguration(
-            "/**",
-            configuration
-        );
+    configuration.setMaxAge(3600L);
 
-        return source;
-    }
+    UrlBasedCorsConfigurationSource source =
+        new UrlBasedCorsConfigurationSource();
+
+    source.registerCorsConfiguration(
+        "/**",
+        configuration
+    );
+
+    return source;
+}
+
 }
