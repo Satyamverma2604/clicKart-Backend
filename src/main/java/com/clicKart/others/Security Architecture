@@ -1,0 +1,141 @@
+                         React
+                           │
+                           │ JWT
+                           ▼
+                  ┌─────────────────┐
+                  │ Spring Security │
+                  └────────┬────────┘
+                           │
+                  JwtAuthenticationFilter
+                           │
+                           ▼
+                    SecurityContext
+                           │
+                           ▼
+                      Controller
+                           │
+                           ▼
+                        Service
+                           │
+                           ▼
+                      Repository
+                           │
+                           ▼
+                         MySQL
+                         
+                         
+                         
+                         
+                         
+******************************STEP BY STEP FLOW************************************                      
+                         
+                         
+                         
+                  
+STEP 1
+Spring Security dependencies
+        ↓
+STEP 2
+PasswordEncoder
+        ↓
+STEP 3
+CustomUserDetailsService
+        ↓
+STEP 4
+SecurityConfig
+        ↓
+STEP 5
+Verify basic Spring Security
+        ↓
+STEP 6
+JWT dependency + JwtUtil
+        ↓
+STEP 7
+Login authentication
+        ↓
+STEP 8
+JwtAuthenticationFilter
+        ↓
+STEP 9
+Connect filter with SecurityConfig
+        ↓
+STEP 10
+Register + BCrypt
+        ↓
+STEP 11
+USER / ADMIN authorization
+        ↓
+STEP 12
+Refactor APIs to authenticated user
+        ↓
+STEP 13
+Security testing
+
+
+
+
+
+
+//Login Flow
+POST /api/auth/login
+        │
+        │ email/phone + password
+        ↓
+   AuthController
+        ↓
+    AuthService
+        ↓
+CustomUserDetailsService
+        ↓
+  Find User
+        ↓
+PasswordEncoder.matches()
+        ↓
+   Password correct?
+      │       │
+     NO      YES
+      │       │
+    401      JwtUtil
+                ↓
+        generateToken()
+                ↓
+          Return JWT
+          
+//Final Flow          
+          
+                    POST /api/auth/login
+                             |
+                             ↓
+                    ┌─────────────────┐
+                    │ AuthController  │
+                    └────────┬────────┘
+                             ↓
+                    ┌─────────────────┐
+                    │   AuthService  │
+                    └────────┬────────┘
+                             ↓
+                 AuthenticationManager
+                             ↓
+                  CustomUserDetailsService
+                             ↓
+                   findByEmail/Phone
+                             ↓
+                          User
+                             ↓
+                    PasswordEncoder
+                             ↓
+                       Password OK
+                             ↓
+                    Authentication
+                             ↓
+                       authentication
+                             ↓
+                    authentication.getName()
+                             ↓
+                         User email
+                             ↓
+                    JwtUtil.generateToken()
+                             ↓
+                           JWT
+                             ↓
+                    LoginResponse

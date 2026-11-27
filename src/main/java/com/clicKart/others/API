@@ -1,0 +1,261 @@
+A clean industry-style API design would be:
+
+                         clicKart APIs
+                              │
+             ┌────────────────┼────────────────┐
+             │                │                │
+          PUBLIC            USER             ADMIN
+             │                │                │
+             ▼                ▼                ▼
+        Auth APIs        User APIs        Admin APIs
+        Product APIs    Cart APIs        Product Mgmt
+        Category APIs   Order APIs       Category Mgmt
+        Search APIs     Address APIs     Order Mgmt
+1. PUBLIC APIs
+
+These don't require login.
+
+Authentication
+Method	Endpoint	Purpose
+POST	/api/auth/register	Register customer
+POST	/api/auth/login	Login and receive JWT
+POST	/api/auth/refresh	Refresh JWT, if implemented
+Product browsing
+Method	Endpoint	Purpose
+GET	/api/products	Get products
+GET	/api/products/{id}	Get product details
+GET	/api/products/active	Get active products
+GET	/api/products/category/{categoryId}	Products by category
+GET	/api/products/search?name=laptop	Search products
+Categories
+Method	Endpoint	Purpose
+GET	/api/categories	Get categories
+GET	/api/categories/{id}	Get category
+
+So a guest can do:
+
+Browse products
+Search products
+View categories
+View product details
+Register
+Login
+2. USER APIs
+
+These require:
+
+Authorization: Bearer <JWT>
+User Profile
+Method	Endpoint	Purpose
+GET	/api/users/me	Get logged-in user's profile
+PUT	/api/users/me	Update profile
+PATCH	/api/users/me/password	Change password
+DELETE	/api/users/me	Deactivate/delete account
+
+I recommend /me rather than:
+
+/users/{id}
+
+for customer self-service APIs because the JWT already identifies the logged-in user.
+
+3. USER ADDRESS APIs
+Method	Endpoint	Purpose
+POST	/api/users/me/addresses	Add address
+GET	/api/users/me/addresses	Get my addresses
+GET	/api/users/me/addresses/{id}	Get one address
+PUT	/api/users/me/addresses/{id}	Update address
+DELETE	/api/users/me/addresses/{id}	Delete address
+
+Later we can add:
+
+PATCH /api/users/me/addresses/{id}/default
+
+for setting the default shipping address.
+
+4. CART APIs
+
+Cart belongs to the logged-in user.
+
+Method	Endpoint	Purpose
+GET	/api/cart	Get my cart
+POST	/api/cart/items	Add product to cart
+PUT	/api/cart/items/{productId}	Update quantity
+DELETE	/api/cart/items/{productId}	Remove product
+DELETE	/api/cart	Clear cart
+
+Example:
+
+POST /api/cart/items
+{
+    "productId": 10,
+    "quantity": 2
+}
+5. USER ORDER APIs
+
+Users should only see their own orders.
+
+Method	Endpoint	Purpose
+POST	/api/orders	Place order / checkout
+GET	/api/orders	Get my orders
+GET	/api/orders/{id}	Get my order details
+POST	/api/orders/{id}/cancel	Cancel my order
+GET	/api/orders/{id}/tracking	Get tracking information
+
+Later, depending on the payment design:
+
+POST /api/orders/{id}/payment
+
+could initiate payment.
+
+6. USER PAYMENT APIs
+
+Payment should be separated from normal order CRUD.
+
+Method	Endpoint	Purpose
+POST	/api/payments/create	Create payment
+GET	/api/payments/{id}	Get payment status
+POST	/api/payments/{id}/verify	Verify payment
+
+But the exact endpoints depend on which gateway we integrate.
+
+7. USER AI CHATBOT APIs
+Method	Endpoint	Purpose
+POST	/api/chatbot/chat	Send message to AI
+GET	/api/chatbot/history	Get chat history
+DELETE	/api/chatbot/history	Clear chat history
+
+Example:
+
+{
+    "message": "Show me laptops under 60000"
+}
+
+The backend can then use:
+
+ChatbotService
+      ↓
+AI API
+      ↓
+ProductService
+      ↓
+ProductRepository
+      ↓
+MySQL
+8. ADMIN APIs
+
+Now the important part.
+
+Admin APIs should be protected with:
+
+ROLE_ADMIN
+ADMIN — Dashboard
+Method	Endpoint	Purpose
+GET	/api/admin/dashboard	Dashboard statistics
+GET	/api/admin/dashboard/sales	Sales statistics
+GET	/api/admin/dashboard/orders	Order statistics
+GET	/api/admin/dashboard/users	User statistics
+
+Later we can add date filters:
+
+/api/admin/dashboard/sales?from=2026-09-01&to=2026-09-26
+9. ADMIN — Product Management
+
+Admin can perform full CRUD.
+
+Method	Endpoint	Purpose
+POST	/api/admin/products	Create product
+GET	/api/admin/products	Get all products
+GET	/api/admin/products/{id}	Get product
+PUT	/api/admin/products/{id}	Update product
+DELETE	/api/admin/products/{id}	Delete product
+PATCH	/api/admin/products/{id}/status	Activate/deactivate
+PATCH	/api/admin/products/{id}/stock	Update stock
+
+This is different from public:
+
+GET /api/products
+
+because public users shouldn't have access to admin operations.
+
+10. ADMIN — Category Management
+Method	Endpoint	Purpose
+POST	/api/admin/categories	Create category
+GET	/api/admin/categories	Get all categories
+GET	/api/admin/categories/{id}	Get category
+PUT	/api/admin/categories/{id}	Update category
+DELETE	/api/admin/categories/{id}	Delete category
+PATCH	/api/admin/categories/{id}/status	Activate/deactivate
+11. ADMIN — User Management
+Method	Endpoint	Purpose
+GET	/api/admin/users	Get all users
+GET	/api/admin/users/{id}	Get user
+PUT	/api/admin/users/{id}	Update user
+DELETE	/api/admin/users/{id}	Delete/deactivate user
+PATCH	/api/admin/users/{id}/status	Enable/disable user
+PATCH	/api/admin/users/{id}/role	Change user role
+
+For example:
+
+PATCH /api/admin/users/15/role
+{
+    "role": "ADMIN"
+}
+
+This endpoint must be heavily protected.
+
+12. ADMIN — Order Management
+
+Admin needs access to orders across the system.
+
+Method	Endpoint	Purpose
+GET	/api/admin/orders	Get all orders
+GET	/api/admin/orders/{id}	Get order
+PATCH	/api/admin/orders/{id}/status	Update order status
+PATCH	/api/admin/orders/{id}/payment-status	Update payment status
+POST	/api/admin/orders/{id}/cancel	Cancel order
+
+Example:
+
+PATCH /api/admin/orders/101/status
+{
+    "status": "SHIPPED"
+}
+13. ADMIN — Inventory
+
+For a real e-commerce project, inventory deserves its own API.
+
+Method	Endpoint	Purpose
+GET	/api/admin/inventory	View inventory
+GET	/api/admin/inventory/low-stock	Low-stock products
+PATCH	/api/admin/inventory/{productId}	Update stock
+
+Example:
+
+GET /api/admin/inventory/low-stock
+
+could return:
+
+[
+    {
+        "productId": 10,
+        "productName": "iPhone 17",
+        "stockQuantity": 4
+    }
+]
+14. ADMIN — Payment Management
+Method	Endpoint	Purpose
+GET	/api/admin/payments	All payments
+GET	/api/admin/payments/{id}	Payment details
+GET	/api/admin/payments/failed	Failed payments
+POST	/api/admin/payments/{id}/refund	Refund payment
+
+Actual refund processing will happen through the payment gateway.
+
+15. ADMIN — AI Chatbot
+
+Admin might eventually need:
+
+Method	Endpoint	Purpose
+GET	/api/admin/chatbot/analytics	Chatbot usage
+GET	/api/admin/chatbot/conversations	View conversations
+GET	/api/admin/chatbot/feedback	Chatbot feedback

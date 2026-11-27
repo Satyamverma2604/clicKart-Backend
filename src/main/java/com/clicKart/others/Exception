@@ -1,0 +1,282 @@
+CUSTOM EXCEPTIONS - USAGE REFERENCE (ClicKart project)
+========================================================
+
+Package: com.clicKart.exception
+
+exception/
+├── ResourceNotFoundException.java      -> 404 Not Found
+├── BadRequestException.java            -> 400 Bad Request
+├── DuplicateResourceException.java     -> 409 Conflict
+├── ResourceOwnershipException.java     -> 403 Forbidden
+├── InvalidOperationException.java      -> 409 Conflict
+├── ErrorResponse.java
+└── GlobalExceptionHandler.java
+
+
+1. WHEN TO USE WHICH EXCEPTION
+--------------------------------------------------
+
+Question                                            -> Exception
+--------------------------------------------------------------------
+Does the resource exist?                            -> ResourceNotFoundException (404)
+Is the input itself malformed/missing/invalid?       -> BadRequestException (400)
+Does it belong to someone else?                      -> ResourceOwnershipException (403)
+Would creating it duplicate something unique?        -> DuplicateResourceException (409)
+Is the resource in a state that blocks this action?  -> InvalidOperationException (409)
+
+
+2. ACTUAL USAGES SO FAR (with exact messages)
+--------------------------------------------------
+
+(1) DuplicateResourceException - 409
+    Where: Product creation
+    Code:
+      if (productRepository.existsByNameIgnoreCaseAndBrandIgnoreCase(request.getName(), request.getBrand())) {
+          throw new DuplicateResourceException(
+              "Product '" + request.getName() + "' already exists with brand '" + request.getBrand() + "'"
+          );
+      }
+
+(2) DuplicateResourceException - 409
+    Where: User registration (email check)
+    Code:
+      if (userRepository.existsByEmail(request.getEmail())) {
+          throw new DuplicateResourceException("Email already exists: " + request.getEmail());
+      }
+
+(3) DuplicateResourceException - 409
+    Where: User registration (phone check)
+    Code:
+      if (request.getPhone() != null && userRepository.existsByPhone(request.getPhone())) {
+          throw new DuplicateResourceException("Phone number already exists: " + request.getPhone());
+      }
+
+(4) ResourceOwnershipException - 403
+    Where: Address ownership check
+    Code:
+      if (!address.getUser().getId().equals(userId)) {
+          throw new ResourceOwnershipException("Address does not belong to this user");
+      }
+
+(5) ResourceNotFoundException - 404
+    Where: Helper method to fetch user by id
+    Code:
+      private User getUserByIdHelper(Long id) {
+          return userRepository.findById(id)
+              .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + id));
+      }
+
+(6) ResourceNotFoundException - 404
+    Where: Cart item lookup
+    Code:
+      CartItem cartItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), productId)
+          .orElseThrow(() -> new ResourceNotFoundException("Product not found in cart with id " + productId));
+
+(7) InvalidOperationException - 409
+    Where: Add to cart - product inactive check
+    Code:
+      if (!product.getActive()) {
+          throw new InvalidOperationException("Product is not available");
+      }
+
+(8) BadRequestException - 400
+    Where: Add to cart - quantity validation
+    Code:
+      if (request.getQuantity() == null || request.getQuantity() <= 0) {
+          throw new BadRequestException("Quantity must be greater than zero");
+      }
+
+(9) InvalidOperationException - 409
+    Where: Add to cart - stock check
+    Code:
+      if (request.getQuantity() > product.getStockQuantity()) {
+          throw new InvalidOperationException(
+              "Insufficient stock for product '" + product.getName() + "'. Available: " + product.getStockQuantity()
+          );
+      }
+
+
+3. EXCEPTION CLASS TEMPLATES
+--------------------------------------------------
+
+package com.clicKart.exception;
+
+public class ResourceNotFoundException extends RuntimeException {
+    public ResourceNotFoundException(String message) {
+        super(message);
+    }
+}
+
+public class BadRequestException extends RuntimeException {
+    public BadRequestException(String message) {
+        super(message);
+    }
+}
+
+public class DuplicateResourceException extends RuntimeException {
+    public DuplicateResourceException(String message) {
+        super(message);
+    }
+}
+
+public class ResourceOwnershipException extends RuntimeException {
+    public ResourceOwnershipException(String message) {
+        super(message);
+    }
+}
+
+public class InvalidOperationException extends RuntimeException {
+    public InvalidOperationException(String message) {
+        super(message);
+    }
+}
+
+
+4. GLOBAL EXCEPTION HANDLER PATTERN
+--------------------------------------------------
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateResource(DuplicateResourceException ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.CONFLICT.value(), ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(ResourceOwnershipException.class)
+    public ResponseEntity<ErrorResponse> handleOwnership(ResourceOwnershipException ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.FORBIDDEN.value(), ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(InvalidOperationException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidOperation(InvalidOperationException ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.CONFLICT.value(), ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidation(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors()
+            .forEach(e -> errors.put(e.getField(), e.getDefaultMessage()));
+        return ResponseEntity.badRequest().body(errors);
+    }
+}
+
+
+5. NOTE
+--------------------------------------------------
+- Note: Spring Security has its own built-in AccessDeniedException.
+  Keep the custom one named ResourceOwnershipException (not AccessDeniedException)
+  to avoid import/behavior clashes if Spring Security is used in the project.
+- Keep message style consistent app-wide, e.g.:
+    "<Thing> already exists: <value>"
+    "<Thing> '<value>' already exists"
+    "<Thing> not found with id <id>"
+    
+    
+    
+    CategoryServiceImpl
+    "Category not found"
+        → ResourceNotFoundException
+
+ProductServiceImpl
+    "Product not found"
+    "Category not found"
+        → ResourceNotFoundException
+
+UserServiceImpl
+    "User not found"
+        → ResourceNotFoundException
+    "Email already exists"
+    "Phone already exists"
+        → DuplicateResourceException
+
+AddressServiceImpl
+    "User not found"
+    "Address not found"
+        → ResourceNotFoundException
+    "Address does not belong to user"
+        → ResourceOwnershipException
+
+CartServiceImpl
+    "User not found"
+    "Cart not found"
+    "Product not found"
+        → ResourceNotFoundException
+    "Product is not available"
+    "Insufficient stock"
+        → BadRequestException
+
+OrderServiceImpl
+    "User not found"
+    "Address not found"
+    "Cart not found"
+    "Order not found"
+        → ResourceNotFoundException
+
+    "Address does not belong to user"
+    "Order does not belong to user"
+        → ResourceOwnershipException
+
+    "Cart is empty"
+    "Insufficient stock"
+    "Product is not available"
+        → BadRequestException
+
+    "Order cannot be cancelled at this stage"
+        → InvalidOperationException
+        
+        
+***********************************************************Complete Flow*************************************************        
+        
+ Client
+  |
+  | GET /api/products/99
+  ↓
+Controller
+  |
+  ↓
+Service
+  |
+  | productRepository.findById(99)
+  |       ↓
+  |    not found
+  |
+  ↓
+throw new ResourceNotFoundException("Product not found")
+  |
+  ↓
+Spring
+  |
+  ↓
+@RestControllerAdvice
+  |
+  ↓
+@ExceptionHandler(ResourceNotFoundException.class)
+  |
+  ↓
+handleResourceNotFound()
+  |
+  ↓
+Create ErrorResponse
+  |
+  ↓
+ResponseEntity
+  |
+  ↓
+HTTP 404 + JSON

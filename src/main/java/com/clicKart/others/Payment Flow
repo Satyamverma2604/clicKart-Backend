@@ -1,0 +1,35 @@
+User
+ │
+ ├── Add Product
+ │
+ ▼
+Cart
+ │
+ ├── Checkout
+ │
+ ▼
+Create Order
+ │
+ ▼
+PENDING_PAYMENT
+ │
+ ▼
+Create Payment
+ │
+ ▼
+Payment Gateway
+ │
+ ▼
+Payment Success
+ │
+ ▼
+Verify Payment
+ │
+ ▼
+Order → CONFIRMED
+ │
+ ▼
+Reduce Inventory
+ │
+ ▼
+Send Email

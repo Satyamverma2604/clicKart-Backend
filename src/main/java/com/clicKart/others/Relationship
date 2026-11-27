@@ -1,0 +1,32 @@
+| Relationship | Recommendation |
+|---|---|
+| User → Address | **Bidirectional** or User → Address depending on use case |
+| User → Cart | **Bidirectional** |
+| Cart → CartItem | **Bidirectional** |
+| CartItem → Product | **Unidirectional from CartItem** |
+| User → Order | **Bidirectional** |
+| Order → OrderItem | **Bidirectional** |
+| OrderItem → Product | **Unidirectional from OrderItem** |
+| Product → Category | Usually **unidirectional from Product** |
+
+
+
+
+
+
+
+
+User
+│
+├── 1 : N ── Address
+│
+├── 1 : 1 ── Cart
+│               │
+│               └── 1 : N ── CartItem ── N : 1 ── Product
+│
+└── 1 : N ── Order
+                │
+                └── 1 : N ── OrderItem ── N : 1 ── Product
+
+
+Product ── N : 1 ── Category

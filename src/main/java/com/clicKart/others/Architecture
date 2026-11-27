@@ -1,0 +1,190 @@
+                           ┌─────────────────┐
+                           │      USER       │
+                           └────────┬────────┘
+                                    │
+                                    ▼
+                         ┌────────────────────┐
+                         │   REACT FRONTEND   │
+                         │                    │
+                         │ React              │
+                         │ Redux Toolkit      │
+                         │ Axios              │
+                         │ React Router       │
+                         └─────────┬──────────┘
+                                   │
+                              HTTPS / REST
+                                   │
+                                   ▼
+                 ┌─────────────────────────────────┐
+                 │         SPRING BOOT API         │
+                 │                                 │
+                 │       Spring Security + JWT     │
+                 └────────────────┬────────────────┘
+                                  │
+                                  ▼
+                 ┌────────────────────────────────┐
+                 │           CONTROLLERS          │
+                 │                                │
+                 │ Auth                           │
+                 │ User                           │
+                 │ Product                        │
+                 │ Category                       │
+                 │ Address                        │
+                 │ Cart                           │
+                 │ Order                          │
+                 │ Payment                        │
+                 │ Chatbot                        │
+                 └────────────────┬───────────────┘
+                                  │
+                                  ▼
+                 ┌─────────────────────────────────┐
+                 │             SERVICES            │
+                 │                                 │
+                 │ Business Logic                  │
+                 │ Validation                      │
+                 │ Cart Calculation                │
+                 │ Order Processing                │
+                 │ Payment Processing              │
+                 │ AI Chat Processing              │
+                 └───────┬───────────────┬─────────┘
+                         │               │
+             ┌───────────┘               └────────────┐
+             ▼                                        ▼
+   ┌───────────────────┐                   ┌──────────────────┐
+   │   JPA REPOSITORY  │                   │ EXTERNAL SERVICES│
+   │                   │                   │                  │
+   │ UserRepository    │                   │ Payment Gateway  │
+   │ ProductRepository │                   │ AI API           │
+   │ OrderRepository   │                   │ Email Service    │
+   │ CartRepository    │                   │                  │
+   └─────────┬─────────┘                   └──────────────────┘
+             │
+             ▼
+      ┌───────────────┐
+      │     MySQL     │
+      │               │
+      │ Users         │
+      │ Products      │
+      │ Categories    │
+      │ Addresses     │
+      │ Cart          │
+      │ Orders        │
+      │ Order Items   │
+      │ Payments      │
+      └───────────────┘
+      
+      
+      
+      
+      
+******************************AUTHENTICATION ARCHITECTURE*******************************
+      
+React
+  │
+  │ POST /api/auth/login
+  │ email + password
+  ▼
+AuthController
+  │
+  ▼
+AuthService
+  │
+  ▼
+AuthenticationManager
+  │
+  ▼
+UserDetailsService
+  │
+  ▼
+UserRepository
+  │
+  ▼
+MySQL
+  │
+  ▼
+User
+  │
+  ▼
+Password verification
+  │
+  ▼
+JWT generated
+  │
+  ▼
+React
+
+
+For subsequent requests:
+
+
+React
+   │
+   │ Authorization: Bearer <JWT>
+   ▼
+JwtAuthenticationFilter
+   │
+   ▼
+Validate JWT
+   │
+   ▼
+SecurityContext
+   │
+   ▼
+Controller
+   │
+   ▼
+Service
+   │
+   ▼
+Repository
+
+******************************REGISTRATION ARCHITECTURE*******************************
+
+
+
+
+                 ┌──────────────────────┐
+                 │       React          │
+                 └──────────┬───────────┘
+                            │
+                 POST /auth/register
+                            │
+                            ▼
+                    ┌──────────────┐
+                    │ AuthService  │
+                    └──────┬───────┘
+                           │
+                    force ROLE_USER
+                           │
+                           ▼
+                        MySQL
+
+
+Spring Boot Startup
+        │
+        ▼
+  ┌──────────────┐
+  │ AdminSeeder  │
+  └──────┬───────┘
+         │
+    force ROLE_ADMIN
+         │
+         ▼
+       MySQL
+
+
+Existing ADMIN
+      │
+      ▼
+/api/admin/users/{id}/role
+      │
+      ▼
+Spring Security
+      │
+  ROLE_ADMIN?
+   /      \
+ YES       NO
+  │         │
+  ▼         ▼
+Update     403
+role
